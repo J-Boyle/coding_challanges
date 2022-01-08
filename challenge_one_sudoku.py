@@ -1,8 +1,7 @@
-import itertools
-from typing import List, Tuple
+from typing import List, Tuple, Iterator
 from math import sqrt
-from random import shuffle
-from itertools import permutations
+from itertools import permutations, product
+from pprint import pprint
 
 sudoku_puzzle = [
     [5, 3, 0, 0, 7, 0, 0, 0, 0],
@@ -23,9 +22,9 @@ class SudokuSolver:
                  puzzle: List[List[int]]):
         self.puzzle = puzzle
 
-        self.possible_rows = []
-        self.possible_columns = []
-        self.possible_boxes = []
+        self.possible_rows = {}
+        self.solution_found = False
+
 
     def replace_zeros(self, variables: List[int], new_numbers: List[int]) -> List[int]:
         return [new_numbers.pop() if i == 0 else i for i in variables]
@@ -33,10 +32,10 @@ class SudokuSolver:
     def find_missing_numbers(self, variable: List[int]) -> List[int]:
         return list(set([i for i in range(1, 11)]) - set(variable))
 
-    def get_columns(self) -> List[List[int]]:
-        return [[row[i] for row in self.puzzle] for i in range(len(self.puzzle))]
+    def get_columns(self, guess) -> List[List[int]]:
+        return [[row[i] for row in guess] for i in range(len(guess))]
 
-    def get_boxes(self) -> List[List[int]]:
+    def get_boxes(self, guess) -> List[Tuple[int]]:
 
         results = []
 
@@ -45,55 +44,66 @@ class SudokuSolver:
              (6,0), (6,3), (6,6)]
 
         for i in t:
-            results.extend([self.get_box(i)])
+            results.extend([self.get_box(i, guess)])
 
         return results
 
 
-    def get_box(self, grid_coords: Tuple[int,int]):
+    def get_box(self, grid_coords: Tuple[int,int], guess) -> List[List[int]]:
         number_of_rows = int(sqrt(len(self.puzzle)))
         x1_coord = grid_coords[0]
         x2_coord = x1_coord + number_of_rows
         y_coord = grid_coords[1]
 
-        result = [self.puzzle[y][x1_coord:x2_coord] for y in [i for i in range(y_coord + number_of_rows)][-number_of_rows:]]
+        result = [guess[y][x1_coord:x2_coord] for y in [i for i in range(y_coord + number_of_rows)][-number_of_rows:]]
 
         return [item for sublist in result for item in sublist]
 
+    def generate_permutations(self, variable: List[int]) -> List[List[int]]:
+
+        missing_numbers = self.find_missing_numbers(variable)
+        missing_numbers_permutations = permutations(missing_numbers)
+
+        return [self.replace_zeros(variable, list(permutation)) for permutation in missing_numbers_permutations]
 
 
-    def generate_permutations(self, variable: List[List[int]]) -> List[List[int]]:
-        results = []
+    def populate_possible_rows(self)-> None:
+        for row_count, row in enumerate(self.puzzle):
+            self.possible_rows[row_count] = self.generate_permutations(row)
 
-        for target in variable:
+    def generate_guesses(self)-> Iterator:
+        return product(row for row in self.possible_rows.values())
 
-            missing_numbers = self.find_missing_numbers(target)
-            missing_numbers_permutations = permutations(missing_numbers)
 
-            results.extend([self.replace_zeros(target, list(permutation)) for permutation in missing_numbers_permutations])
+    def guess_is_correct(self, guess) -> None:
+        cols = self.get_columns(guess)
+        boxes = self.get_boxes(guess)
 
-        return results
+        self.solution_found = True if all([self.is_satisfied(guess), self.is_satisfied(cols), self.is_satisfied(boxes)]) else False
 
-    def populate_possible_options(self):
-        self.possible_rows = self.generate_permutations(self.puzzle)
-        self.possible_columns = self.generate_permutations(self.get_columns())
-        self.possible_boxes = self.generate_permutations(self.get_boxes())
 
-    def solve(self):
+    def is_satisfied(self, variables: List[List[int]])-> bool:
+        return all([len(set(attempt)) == len(attempt) for attempt in variables])
 
-        self.populate_possible_options()
+    def solve(self)-> List[List[int]]:
+        guess_count = 0
+        print('----- Starting -----')
+        self.populate_possible_rows()
+        print(self.generate_guesses().__next__())
+        # while not self.solution_found:
+        #     print(f'Attempt No: {guess_count}')
+        #     guesses = self.generate_guesses()
+        #     print(guesses.__next__())
+        #     # self.guess_is_correct(guesses.__next__())
+        #     guess_count += 1
 
-        for row_i in self.possible_rows:
-            for col_i in self.possible_columns:
-                pass
+        print(('----- Solutiuon Found -----'))
 
-    def is_satisfied(self, variables) -> bool:
-        return len(set(variables)) == len(variables)
 
 
 if __name__ == '__main__':
     x = SudokuSolver(sudoku_puzzle)
-    x.populate_possible_options()
-    print(x.possible_boxes)
+    x.solve()
+
 
 
