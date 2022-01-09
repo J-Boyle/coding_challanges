@@ -34,18 +34,12 @@ class SudokuSolver:
     def get_columns(self, guess) -> List[List[int]]:
         return [[row[i] for row in guess] for i in range(len(guess))]
 
-    def get_boxes(self, guess) -> List[Tuple[int]]:
-
-        results = []
-
-        t = [(0, 0), (0, 3), (0, 6),
-             (3, 0), (3, 3), (3, 6),
-             (6, 0), (6, 3), (6, 6)]
-
-        for i in t:
-            results.extend([self.get_box(i, guess)])
-
-        return results
+    def get_box_coordinates(self) -> List[Tuple[int, int]]:
+        """
+        coordinates are for top left corner of each "box" with 0,0 being on the top left corner
+        """
+        coords_numbers = [i for i in range(0, len(self.puzzle), int(sqrt(len(self.puzzle))))]
+        return list(product(coords_numbers, coords_numbers[::-1]))
 
     def get_box(self, grid_coords: Tuple[int, int], guess) -> List[List[int]]:
         number_of_rows = int(sqrt(len(self.puzzle)))
@@ -57,11 +51,12 @@ class SudokuSolver:
 
         return [item for sublist in result for item in sublist]
 
-    def generate_permutations(self, variable: List[int]) -> List[List[int]]:
+    def get_boxes(self, guess) -> List[List[int]]:
+        return [self.get_box(coord, guess) for coord in self.get_box_coordinates()]
 
+    def generate_permutations(self, variable: List[int]) -> List[List[int]]:
         missing_numbers = self.find_missing_numbers(variable)
         missing_numbers_permutations = permutations(missing_numbers)
-
         return [self.replace_zeros(variable, list(permutation)) for permutation in missing_numbers_permutations]
 
     def populate_possible_rows(self) -> None:
@@ -71,7 +66,7 @@ class SudokuSolver:
     def generate_guesses(self) -> Iterator:
         return product(*[row for row in self.possible_rows.values()])
 
-    def guess_is_correct(self, guess:List[List[int]]) -> None:
+    def guess_is_correct(self, guess: List[List[int]]) -> None:
         cols = self.get_columns(guess)
         boxes = self.get_boxes(guess)
 
