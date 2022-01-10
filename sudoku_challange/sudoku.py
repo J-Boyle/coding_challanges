@@ -22,8 +22,8 @@ class SudokuSolver:
                  puzzle: List[List[int]]):
         self.puzzle = puzzle
 
-        self.possible_rows = {}
-        self.solution_found = False
+        self.possible_rows:dict = {}
+        self.solution_found: bool = False
 
     def replace_zeros(self, variables: List[int], new_numbers: List[int]) -> List[int]:
         return [new_numbers.pop() if i == 0 else i for i in variables]
@@ -70,8 +70,7 @@ class SudokuSolver:
         cols = self.get_columns(guess)
         boxes = self.get_boxes(guess)
 
-        self.solution_found = True if all(
-            [self.is_satisfied(guess), self.is_satisfied(cols), self.is_satisfied(boxes)]) else False
+        self.solution_found = all([self.is_satisfied(guess), self.is_satisfied(cols), self.is_satisfied(boxes)])
 
     def is_satisfied(self, variables: List[List[int]]) -> bool:
         return all([len(set(attempt)) == len(attempt) for attempt in variables])
