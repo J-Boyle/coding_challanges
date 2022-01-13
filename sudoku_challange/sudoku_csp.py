@@ -22,20 +22,24 @@ domains: Dict[List[int], List[int]] = {}
 for variable in variables:
     domains[variable] = [i for i in range(0,11)]
 
-class SudokuConstraint(Constaint):
+class SudokuUtility:
 
-    def get_columns(self) -> List[List[int]]:
-        return [[row[i] for row in self.variables] for i in range(len(self.variables))]
+    def __init__(self,
+                 puzzle: List[List[int]]):
+        self.puzzle = puzzle
+
+    def get_columns(self, guess) -> List[List[int]]:
+        return [[row[i] for row in guess] for i in range(len(guess))]
 
     def get_box_coordinates(self) -> List[Tuple[int, int]]:
         """
         coordinates are for top left corner of each "box" with 0,0 being on the top left corner
         """
-        coords_numbers = [i for i in range(0, len(self.variables), int(sqrt(len(self.variables))))]
+        coords_numbers = [i for i in range(0, len(self.puzzle), int(sqrt(len(self.puzzle))))]
         return list(product(coords_numbers, coords_numbers[::-1]))
 
     def get_box(self, grid_coords: Tuple[int, int], guess) -> List[List[int]]:
-        number_of_rows = int(sqrt(len(self.variables)))
+        number_of_rows = int(sqrt(len(self.puzzle)))
         x1_coord = grid_coords[0]
         x2_coord = x1_coord + number_of_rows
         y_coord = grid_coords[1]
@@ -46,6 +50,14 @@ class SudokuConstraint(Constaint):
 
     def get_boxes(self, guess) -> List[List[int]]:
         return [self.get_box(coord, guess) for coord in self.get_box_coordinates()]
+
+
+class SudokuConstraint(Constaint):
+
+    def __init__(self, list_1, list_2):
+        super().__init__([list_1, list_2])
+        self.list_1 = list_1
+        self.list_2 = list_2
 
     def satisfied(self, assignment: Dict[V, D]) -> bool:
         pass
