@@ -25,13 +25,7 @@ class SudokuUtility:
     def __init__(self,
                  puzzle: List[List[int]]):
         self.puzzle = puzzle
-        self.possible_rows: List = []
-
-    def replace_zeros(self, variables: List[int], new_numbers: List[int]) -> List[int]:
-        return [new_numbers.pop() if i == 0 else i for i in variables]
-
-    def find_missing_numbers(self, variable: List[int]) -> List[int]:
-        return list(set([i for i in range(1, 11)]) - set(variable))
+        self.possible_numbers = [i for i in range(1,10)]
 
     def get_columns(self, guess) -> List[List[int]]:
         return [[row[i] for row in guess] for i in range(len(guess))]
@@ -56,45 +50,46 @@ class SudokuUtility:
     def get_boxes(self, guess) -> List[List[int]]:
         return [self.get_box(coord, guess) for coord in self.get_box_coordinates()]
 
-    def generate_permutations(self, variable: List[int]) -> List[List[int]]:
-        missing_numbers = self.find_missing_numbers(variable)
-        missing_numbers_permutations = permutations(missing_numbers)
-        return [self.replace_zeros(variable, list(permutation)) for permutation in missing_numbers_permutations]
+    def guess_is_correct(self, guess: List[List[int]]) -> bool:
+        cols = self.get_columns(guess)
+        boxes = self.get_boxes(guess)
 
-    def populate_possible_rows(self) -> None:
-        # for row_count, row in enumerate(self.puzzle):
-        #     self.possible_rows[row_count] = self.generate_permutations(row)
-        for row in self.puzzle:
-            self.possible_rows.append(self.generate_permutations(row))
+        return all([self.is_satisfied(guess), self.is_satisfied(cols), self.is_satisfied(boxes)])
 
+    def is_satisfied(self, variables: List[List[int]]) -> bool:
 
-variables: List[int] = [i for row in sudoku_puzzle for i in row]
-#[5, 3, 0, 0, 7, 0, 0, 0, 0, 6, 0, 0, 1, 9, 5, 0, 0, .....] all numbers in the puzzle
+        result = [[number for number in row if number!=0] for row in variables]
 
-domains: Dict[int, List[int]] = {}
+        return all([len(set(attempt)) == len(attempt) for attempt in result])
 
-for variable in variables:
-    domains[variable] = [i for i in range(1,11)] #[1,2,3,4,5,6,7,8,9,10] all possible values for each variable
-
-
-class SudokuConstraint(Constaint):
-
-    def __init__(self, variables):
-        super().__init__([variables])
-
-
-    def satisfied(self, assignment: Dict[V, D]) -> bool:
-        if variables != 0: #we only want to target the zeros
-            return True
-
-        #add function to unflatten the list and then check rows, cols and boxes for duplicate numbers greater than 3
-
-def nest_flat_list():
-    pass
+    def solve(self, puzzle: List[List[int]] = None):
+        local_puzzle = puzzle.copy()
+        for index_row, row in enumerate(local_puzzle):
+            for index_number, number in enumerate(local_puzzle):
+                if local_puzzle[index_row][index_number] == 0:
+                    for guess in self.possible_numbers:
+                        local_puzzle[index_row][index_number] = guess
+                        if self.guess_is_correct(local_puzzle):
+                            print('guess is correct')
+                            result = self.solve(local_puzzle)
+                            self.print_result(local_puzzle)
+                            if result is not None:
+                                return result
+                        else:
+                            print('guess is incorrect')
+        return None
 
 
-
+    def print_result(self, result: List[List[int]]) -> None:
+        print(*[row for row in result], sep='\n')
+        print('------')
 
 
 if __name__ == '__main__':
-    pass
+    test = SudokuUtility(sudoku_puzzle)
+    x = test.solve(sudoku_puzzle)
+    if x is None:
+        print('No Solution Found')
+    else:
+        x.print_result()
+
