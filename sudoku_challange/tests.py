@@ -1,6 +1,6 @@
 import pytest
-from sudoku_challange.sudoku_csp import get_columns, get_box_coordinates, get_box, get_all_boxes, guess_is_correct, \
-    is_satisfied, find_empty
+from sudoku_challange.sudoku_solver import get_columns, get_box_coordinates, get_box, get_all_boxes, guess_is_correct, \
+    is_satisfied, find_empty_position
 
 
 @pytest.fixture
@@ -90,10 +90,10 @@ def test_guess_is_correct(question):
     assert guess_is_correct(1, question, 0,2) == True
 
 def test_find_empty(question):
-    assert find_empty(question) == (0,2)
+    assert find_empty_position(question) == (0, 2)
 
 def test_find_empty_complete(answer):
-    assert find_empty(answer) == None
+    assert find_empty_position(answer) == None
 
 
 
