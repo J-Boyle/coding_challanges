@@ -1,6 +1,7 @@
-from typing import List, Tuple
+from typing import List, Tuple, Optional
 from math import sqrt
 from itertools import product
+from time import time
 
 
 def get_columns(guess) -> List[List[int]]:
@@ -8,9 +9,7 @@ def get_columns(guess) -> List[List[int]]:
 
 
 def get_box_coordinates(puzzle) -> List[Tuple[int, int]]:
-    """
-    coordinates are for top left corner of each "box" with 0,0 being on the top left corner
-    """
+    """coordinates are for top left corner of each "box" with 0,0 being on the top left corner"""
     coords_numbers = [i for i in range(0, len(puzzle), int(sqrt(len(puzzle))))]
     return list(product(coords_numbers, coords_numbers[::-1]))
 
@@ -30,11 +29,13 @@ def get_all_boxes(guess) -> List[List[int]]:
     return [get_box(coord, guess) for coord in get_box_coordinates(guess)]
 
 
-def guess_is_correct(guess: List[List[int]]) -> bool:
-    cols = get_columns(guess)
-    boxes = get_all_boxes(guess)
+def guess_is_correct(guess: int, puzzle:List[List[int]], row:int, col:int) -> bool:
+    puzzle[row][col] = guess
 
-    return all([is_satisfied(guess), is_satisfied(cols), is_satisfied(boxes)])
+    cols = get_columns(puzzle)
+    boxes = get_all_boxes(puzzle)
+
+    return all([is_satisfied(puzzle), is_satisfied(cols), is_satisfied(boxes)])
 
 
 def is_satisfied(target: List[List[int]]) -> bool:
@@ -45,7 +46,7 @@ def is_satisfied(target: List[List[int]]) -> bool:
     return all([len(set(attempt)) == len(attempt) for attempt in result])
 
 
-def find_empty(puzzle) -> Tuple[int, int]:
+def find_empty(puzzle) -> Optional[Tuple[int, int]]:
     for index_row, row in enumerate(puzzle):
         for index_number, number in enumerate(puzzle):
             if puzzle[index_row][index_number] == 0:
@@ -59,7 +60,6 @@ def solve(puzzle)-> bool:
 
     # Base case of recursion
     empty_position = find_empty(puzzle)
-    print(empty_position)
     if not empty_position:
         # If there are no more empty positions puzzle is solved
         return True
@@ -67,25 +67,21 @@ def solve(puzzle)-> bool:
         row, col = empty_position
 
     for guess in range(1, 10):  # todo make this dynamic
-        puzzle[row][col] = guess
-        if guess_is_correct(puzzle):
-            print('correct guess')
-            print(puzzle)
+        if guess_is_correct(guess, puzzle, row, col):
+            puzzle[row][col] = guess
             if solve(puzzle):
                 return True
-
-            puzzle[row][col] = 0
-            print('backtracking...')
+        puzzle[row][col] = 0
 
     return False
 
 
 def print_result(result: List[List[int]]) -> None:
     print(*[row for row in result], sep='\n')
-    print('------')
 
 
 if __name__ == '__main__':
+    start = time()
     sudoku_puzzle = [
         [5, 3, 0, 0, 7, 0, 0, 0, 0],
         [6, 0, 0, 1, 9, 5, 0, 0, 0],
@@ -99,7 +95,8 @@ if __name__ == '__main__':
     ]
 
     if solve(sudoku_puzzle):
+        finished = time()
+        print(finished - start)
         print_result(sudoku_puzzle)
     else:
         print('No Solution Found')
-        print_result(sudoku_puzzle)

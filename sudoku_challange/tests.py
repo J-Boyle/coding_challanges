@@ -83,11 +83,11 @@ def test_is_not_satisfied(wrong_answer):
 def test_is_satisfied(answer):
     assert is_satisfied(answer) == True
 
-def test_guess_is_incorrect(wrong_answer):
-    assert guess_is_correct(wrong_answer) == False
+def test_guess_is_incorrect(question):
+    assert guess_is_correct(3, question, 0,2) == False
 
-def test_guess_is_correct(wrong_answer):
-    assert guess_is_correct(wrong_answer) == False
+def test_guess_is_correct(question):
+    assert guess_is_correct(1, question, 0,2) == True
 
 def test_find_empty(question):
     assert find_empty(question) == (0,2)
