@@ -1,7 +1,7 @@
 from typing import List, Tuple, Optional
 from math import sqrt
 from itertools import product
-from time import time
+from timeit import timeit
 
 
 def get_columns(puzzle: List[List[int]]) -> List[List[int]]:
@@ -89,23 +89,29 @@ def print_result(result: List[List[int]]) -> None:
     print(*[row for row in result], sep='\n')
 
 
-if __name__ == '__main__':
-    start = time()
-    sudoku_puzzle = [
-        [5, 3, 0, 0, 7, 0, 0, 0, 0],
-        [6, 0, 0, 1, 9, 5, 0, 0, 0],
-        [0, 9, 8, 0, 0, 0, 0, 6, 0],
-        [8, 0, 0, 0, 6, 0, 0, 0, 3],
-        [4, 0, 0, 8, 0, 3, 0, 0, 1],
-        [7, 0, 0, 0, 2, 0, 0, 0, 6],
-        [0, 6, 0, 0, 0, 0, 2, 8, 0],
-        [0, 0, 0, 4, 1, 9, 0, 0, 5],
-        [0, 0, 0, 0, 8, 0, 0, 7, 9]
-    ]
+sudoku_puzzle = [
+    [5, 3, 0, 0, 7, 0, 0, 0, 0],
+    [6, 0, 0, 1, 9, 5, 0, 0, 0],
+    [0, 9, 8, 0, 0, 0, 0, 6, 0],
+    [8, 0, 0, 0, 6, 0, 0, 0, 3],
+    [4, 0, 0, 8, 0, 3, 0, 0, 1],
+    [7, 0, 0, 0, 2, 0, 0, 0, 6],
+    [0, 6, 0, 0, 0, 0, 2, 8, 0],
+    [0, 0, 0, 4, 1, 9, 0, 0, 5],
+    [0, 0, 0, 0, 8, 0, 0, 7, 9]
+]
 
-    if solve(sudoku_puzzle):
-        finished = time()
-        print(f'Time: {round((finished - start), 2)}s')
-        print_result(sudoku_puzzle)
-    else:
-        print('No Solution Found')
+
+def avg_solve_time():
+    return solve(sudoku_puzzle)
+
+
+
+if __name__ == '__main__':
+
+    # if solve(sudoku_puzzle):
+    #     print_result(sudoku_puzzle)
+    # else:
+    #     print('No Solution Found')
+
+    print(f'Avg Time: {timeit(avg_solve_time, number=100)}s')
