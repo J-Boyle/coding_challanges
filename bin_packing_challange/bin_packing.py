@@ -44,19 +44,20 @@ def first_fit_algorithm(services: List[Service], bin_capacity: int) -> List[bin]
 
     bins = [Bin(bin_capacity)]
 
-
-    for service in services:
+    for service_index, service in enumerate(services):
         for bin in bins:
-            if fits_in_bin(service, bin):
-                bin.items_contained.append(service)
-                services.remove(service)
-                break
-            else:
-                new_bin = Bin(bin_capacity)
-                new_bin.items_contained.append(service)
-                services.remove(service)
-                bins.append(new_bin)
-                break
+            if not fits_in_bin(service, bin):
+                print(f'{service} did not fit in bin')
+                continue
+            print(f'{service} DID fit in bin')
+            bin.items_contained.append(services.pop(service_index))
+            break
+
+        if service in services:
+            new_bin = Bin(bin_capacity)
+            new_bin.items_contained.append(services.pop(service_index))
+            bins.append(new_bin)
+
     return bins
 
 
