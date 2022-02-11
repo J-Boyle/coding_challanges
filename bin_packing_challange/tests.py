@@ -5,7 +5,7 @@ from bin_packing_challange.bin_packing import Service, sort_services_by_size, Bi
 
 @pytest.fixture
 def electrical_ladder():
-    return Service(MEP='elec',
+    return Service(discipline='elec',
                    description='ladder',
                    width=450,
                    access_maintenance_space=100)
@@ -13,7 +13,7 @@ def electrical_ladder():
 
 @pytest.fixture
 def electrical_basket():
-    return Service(MEP='elec',
+    return Service(discipline='elec',
                    description='basket',
                    width=300,
                    access_maintenance_space=100)
@@ -21,7 +21,7 @@ def electrical_basket():
 
 @pytest.fixture
 def mechanical_duct():
-    return Service(MEP='mech',
+    return Service(discipline='mech',
                    description='duct',
                    width=500,
                    access_maintenance_space=100)
@@ -29,7 +29,7 @@ def mechanical_duct():
 
 @pytest.fixture
 def misc_large_services():
-    return Service(MEP='misc',
+    return Service(discipline='misc',
                    description='misc',
                    width=3500,
                    access_maintenance_space=100)
@@ -55,4 +55,6 @@ def test_does_not_fit_in_bin(misc_large_services, bin):
 
 
 def test_first_fit_algorithm(electrical_basket, electrical_ladder, mechanical_duct):
-    print(first_fit_algorithm([electrical_basket, electrical_ladder, mechanical_duct], 900))
+    services = sort_services_by_size([electrical_basket, electrical_ladder, mechanical_duct])
+    result = first_fit_algorithm(services, 900)
+    print(result)
