@@ -1,7 +1,6 @@
 from typing import NamedTuple
 from typing import List
 from math import ceil
-from timeit import timeit
 
 
 class Service(NamedTuple):
@@ -32,7 +31,6 @@ class Bin:
 
 
 def lower_bound(services: List[Service], bin: Bin) -> float:
-    """ The best possible solution in an ideal world"""
     return ceil(sum([(service.width + service.access_maintenance_space) for service in services]) / bin.capacity)
 
 
@@ -60,7 +58,7 @@ def first_fit_algorithm(services: List[Service], bin_capacity: int) -> List[Bin]
     return bins
 
 
-def total_bin_utilisation(bins: List[Bin])-> float:
+def total_bin_utilisation(bins: List[Bin]) -> float:
     total_capacity = sum(bin.capacity for bin in bins)
     total_capacity_used = sum(bin.capacity_used() for bin in bins)
     return round((total_capacity_used / total_capacity) * 100, 2)
@@ -77,6 +75,7 @@ def print_results(bins: List[Bin]) -> None:
 
 
 if __name__ == '__main__':
+    # Creating Services and setting bin variables
     tray = Service('elec', 'tray', 300, 200)
     ladder = Service('elec', 'ladder', 900, 200)
     trunking = Service('elec', 'trunking', 150, 200)
@@ -89,18 +88,19 @@ if __name__ == '__main__':
     drainage_pipe = Service('ph', 'drainage_pipe', 75, 200)
     spinkler_pipe = Service('ph', 'sprinkler_pipe', 100, 200)
 
-    services = [tray,tray,tray,tray,
-                ladder,ladder,ladder,ladder,
-                trunking,trunking,
-                cw_pipe,cw_pipe,
-                lthw_pipe,lthw_pipe,
-                duct,duct,duct,duct,
-                bcw_pipe,bcw_pipe,bcw_pipe,
-                drainage_pipe,drainage_pipe,drainage_pipe,
-                spinkler_pipe,spinkler_pipe]
+    services = [tray, tray, tray, tray,
+                ladder, ladder, ladder, ladder,
+                trunking, trunking,
+                cw_pipe, cw_pipe,
+                lthw_pipe, lthw_pipe,
+                duct, duct, duct, duct,
+                bcw_pipe, bcw_pipe, bcw_pipe,
+                drainage_pipe, drainage_pipe, drainage_pipe,
+                spinkler_pipe, spinkler_pipe]
 
     corridor_width = 2500
 
+    # Running Algorithms
     lower_bound_threshold = lower_bound(services, Bin(corridor_width))
 
     first_fit_bins = first_fit_algorithm(services, corridor_width)
@@ -109,6 +109,7 @@ if __name__ == '__main__':
 
     first_fit_decreasing_bins = first_fit_algorithm(services_by_decreasing_size, corridor_width)
 
+    # Formatting Results
     print('*** RESULTS SUMMARY ***')
     print(f'Lower Bound: {lower_bound_threshold}')
     print(f'First Fit Algorithm = QTY: {len(first_fit_bins)}, '
