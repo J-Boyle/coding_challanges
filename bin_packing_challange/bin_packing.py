@@ -60,9 +60,6 @@ def first_fit_algorithm(services: List[Service], bin_capacity: int) -> List[Bin]
     return bins
 
 
-def full_bin_algorithm(services: List[Service], num_corridors: int, corridor_width: float) -> dict:
-    pass
-
 def total_bin_utilisation(bins: List[Bin])-> float:
     total_capacity = sum(bin.capacity for bin in bins)
     total_capacity_used = sum(bin.capacity_used() for bin in bins)

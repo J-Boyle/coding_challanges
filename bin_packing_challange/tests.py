@@ -57,4 +57,4 @@ def test_does_not_fit_in_bin(misc_large_services, bin):
 def test_first_fit_algorithm(electrical_basket, electrical_ladder, mechanical_duct):
     services = sort_services_by_size([electrical_basket, electrical_ladder, mechanical_duct])
     result = first_fit_algorithm(services, 900)
-    print(result)
+    assert len(result) == 3
