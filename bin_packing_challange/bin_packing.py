@@ -24,7 +24,10 @@ class Bin:
         self.items_contained = [] if items_contained == None else items_contained
 
     def capacity_used(self):
-        return sum([service.width + service.access_maintenance_space for service in self.items_contained])
+        if self.items_contained:
+            return sum([service.width + service.access_maintenance_space for service in self.items_contained] ) + self.items_contained[-1].access_maintenance_space
+
+        return 0
 
     def capacity_wasted(self):
         return self.capacity - self.capacity_used()
@@ -56,7 +59,6 @@ def first_fit_algorithm(services: List[Service], bin_capacity: int) -> List[Bin]
             bins.append(new_bin)
 
     return bins
-
 
 def total_bin_utilisation(bins: List[Bin]) -> float:
     total_capacity = sum(bin.capacity for bin in bins)
